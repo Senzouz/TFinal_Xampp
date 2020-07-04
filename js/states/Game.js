@@ -2,8 +2,8 @@ Game = function () {};
 
 Game.prototype = {
   init: function (currentLevel, hp) {
+    this.hp = hp;
     this.currentLevel = currentLevel.currentLevel || 1;
-    this.playerHP = hp == 3 ? hp : hp + 1;
     this.numLevels = 3;
     this.PLAYER_SPEED = 200;
     this.BULLET_SPEED = -200;
@@ -25,24 +25,14 @@ Game.prototype = {
     this.orchestra = this.game.add.audio("orchestra");
     //this.orchestra.play();
 
-    this.player = this.game.add.sprite(
-      this.game.world.centerX,
-      this.game.world.height - 50,
-      "player"
-    );
-    this.game.physics.arcade.enable(this.player);
-    this.player.anchor.setTo(0.5);
-    this.player.body.collideWorldBounds = true;
+    this.player = new Player(this.game, this.hp, this.PLAYER_SPEED);
+    this.player.createBullet.add(this.createPlayerBullet, this);
+
     this.initBullets();
     this.initEnemies();
     this.loadLevel();
-    this.spaceBar = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 
-    this.keys = this.input.keyboard.createCursorKeys();
-    this.AKey = this.input.keyboard.addKey(Phaser.Keyboard.A);
-    this.DKey = this.input.keyboard.addKey(Phaser.Keyboard.D);
-    this.WKey = this.input.keyboard.addKey(Phaser.Keyboard.W);
-    this.SKey = this.input.keyboard.addKey(Phaser.Keyboard.S);
+    this.spaceBar = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 
     this.score = 0;
     this.scoreText = this.game.add.text(
@@ -63,12 +53,12 @@ Game.prototype = {
     this.playerBullets = this.game.add.group();
     this.playerBullets.enableBody = true;
   },
-  createPlayerBullet: function () {
+  createPlayerBullet: function (x, y) {
     let bullet = this.playerBullets.getFirstDead();
     if (!bullet) {
-      bullet = new PlayerBullet(this.game, this.player.x, this.player.y);
+      bullet = new PlayerBullet(this.game, x, y);
     } else {
-      bullet.reset(this.player.x, this.player.y);
+      bullet.reset(x, y);
     }
     this.playerBullets.add(bullet);
     bullet.body.velocity.y = this.BULLET_SPEED;
@@ -79,7 +69,7 @@ Game.prototype = {
       function () {
         this.orchestra.stop();
         this.currentLevel++;
-        if (this.currentLevel > this.numLevels) {
+        if (this.currentLevel <= this.numLevels) {
           this.game.state.start(
             "Game",
             true,
@@ -126,9 +116,9 @@ Game.prototype = {
       if (key == "yellowEnemy") bullet.body.velocity.y = -this.BULLET_SPEED;
       if (key == "redEnemy") {
         bullet.body.velocity.x =
-          -this.BULLET_SPEED * ((this.player.x - x) / 500);
+          -this.BULLET_SPEED * ((this.player.x - x) / 750);
         bullet.body.velocity.y =
-          -this.BULLET_SPEED * ((this.player.y - y) / 500);
+          -this.BULLET_SPEED * ((this.player.y - y) / 750);
       }
     }
   },
@@ -140,32 +130,9 @@ Game.prototype = {
     }
 
     this.shooting_time += this.game.time.elapsed;
-    this.player.body.velocity.x = 0;
-    this.player.body.velocity.y = 0;
-    if (this.game.input.activePointer.isDown) {
-      let targetX = this.game.input.activePointer.position.x;
-      let directionX = targetX >= this.player.x ? 1 : -1;
-      this.player.body.velocity.x = directionX * this.PLAYER_SPEED;
-
-      let targetY = this.game.input.activePointer.position.y;
-      let directionY = targetY >= this.player.y ? 1 : -1;
-      this.player.body.velocity.y = directionY * this.PLAYER_SPEED;
-    }
     if (this.spaceBar.isDown && this.shooting_time >= this.SHOOTING_TIMER) {
       this.shooting_time = 0;
-      this.createPlayerBullet();
-    }
-    if (this.keys.left.isDown || this.AKey.isDown) {
-      this.player.body.velocity.x = -300;
-    }
-    if (this.keys.right.isDown || this.DKey.isDown) {
-      this.player.body.velocity.x = 300;
-    }
-    if (this.keys.down.isDown || this.SKey.isDown) {
-      this.player.body.velocity.y = 300;
-    }
-    if (this.keys.up.isDown || this.WKey.isDown) {
-      this.player.body.velocity.y = -300;
+      this.player.shoot();
     }
     this.game.physics.arcade.overlap(
       this.playerBullets,
@@ -181,6 +148,7 @@ Game.prototype = {
       null,
       this
     );
+    this.game.input.onDown.add(this.toggle, this);
   },
   isClose: function (actual, target) {
     return Math.abs(actual - target) < 0.1;
@@ -194,11 +162,27 @@ Game.prototype = {
   damagePlayer: function (player, bullet) {
     bullet.kill();
     //player.damage(1)
-    this.playerHP--;
-    console.log(this.playerHP);
-    if (this.playerHP == 0) {
+    this.player.hp--;
+    console.log(this.player.hp);
+    console.log(bullet.position);
+    if (this.player.hp == 0) {
       this.orchestra.stop();
       this.game.state.start("GameOver", true, false, this.currentLevel);
+    }
+  },
+  toggle: function () {
+    this.showDebug = this.showDebug ? false : true;
+
+    if (!this.showDebug) {
+      this.game.debug.reset();
+    }
+  },
+  render: function () {
+    if (this.showDebug) {
+      this.game.debug.body(this.player);
+      this.enemyBullets.forEach(function (enemy) {
+        this.game.debug.body(enemy);
+      }, this);
     }
   },
 };

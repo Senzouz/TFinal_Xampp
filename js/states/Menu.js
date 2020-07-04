@@ -15,6 +15,7 @@ Menu.prototype = {
       "logo"
     );
     this.logo.anchor.setTo(0.5);
+    this.logo.scale.setTo(0.5);
 
     this.button1 = this.add.sprite(0, 0, "greenEnemy");
     this.button1.anchor.setTo(0.5);

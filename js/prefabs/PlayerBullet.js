@@ -1,13 +1,9 @@
 PlayerBullet = function (game, x, y) {
-  Phaser.Sprite.call(this, game, x, y, "bullet");
+  Phaser.Sprite.call(this, game, x, y, "burbuja");
   this.anchor.setTo(0.5);
-  this.scale.setTo(2.0);
+  this.scale.setTo(0.075);
   this.checkWorldBounds = true;
   this.outOfBoundsKill = true;
-
-  /*this.events.onOutOfBounds.add(function(){
-        console.log("me mori :v");
-    },this);*/
 };
 
 PlayerBullet.prototype = Object.create(Phaser.Sprite.prototype);

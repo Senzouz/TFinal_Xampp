@@ -4,6 +4,10 @@ GameOver = function (game) {};
 GameOver.prototype = {
   init: function (currentLevel) {
     this.msg = currentLevel == 3 ? "VICTORY" : "DEFEAT";
+    this.gameover_theme = this.game.add.audio(
+      currentLevel == 3 ? "Victoria" : "Derrota"
+    );
+    this.gameover_theme.play();
   },
   create: function () {
     this.background = this.game.add.tileSprite(
@@ -24,6 +28,7 @@ GameOver.prototype = {
     this.msgTEXT.events.onInputDown.add(this.GoToMenu, this);
   },
   GoToMenu: function () {
+    this.gameover_theme.stop();
     this.state.start("Menu");
   },
 };

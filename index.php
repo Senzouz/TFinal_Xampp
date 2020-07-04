@@ -18,6 +18,7 @@
     <script type="text/javascript" src="js/prefabs/PlayerBullet.js?<?php echo "?v=".time() ?>"></script>
     <script type="text/javascript" src="js/prefabs/EnemyBullet.js?<?php echo "?v=".time() ?>"></script>
     <script type="text/javascript" src="js/prefabs/Enemy.js?<?php echo "?v=".time() ?>"></script>
+    <script type="text/javascript" src="js/prefabs/Player.js?<?php echo "?v=".time() ?>"></script>
     <script type="text/javascript" src="js/main.js?<?php echo "?v=".time() ?>"></script>
   </body>
 </html>
