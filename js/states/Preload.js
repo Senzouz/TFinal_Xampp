@@ -31,12 +31,19 @@ Preload.prototype = {
     this.load.text("level1", "assets/data/level1.json");
     this.load.text("level2", "assets/data/level2.json");
     this.load.text("level3", "assets/data/level3.json");
-    this.load.audio("orchestra", [
-      "assets/audio/8bit-orchestra.mp3",
-      "assets/audio/8bit-orchestra.ogg",
-    ]);
+    //Load Music
+    this.load.audio("orchestra", ["assets/audio/8bit-orchestra.ogg"]);
     this.load.audio("Victoria", ["assets/audio/Victoria.ogg"]);
     this.load.audio("Derrota", ["assets/audio/Derrota.ogg"]);
+    //Load audios
+    this.load.audio("end_level", ["assets/audio/end_level.wav"]);
+    this.load.audio("enemy_die", ["assets/audio/enemy_die.wav"]);
+    this.load.audio("enemy_shoot", ["assets/audio/enemy_shoot.mp3"]);
+    this.load.audio("int_tp", ["assets/audio/in_tp.wav"]);
+    this.load.audio("init_level", ["assets/audio/init_level.wav"]);
+    this.load.audio("out_tp", ["assets/audio/out_tp.wav"]);
+    this.load.audio("player_die", ["assets/audio/player_die.wav"]);
+    this.load.audio("player_shoot", ["assets/audio/player_shoot.wav"]);
   },
   create: function () {
     this.state.start("Menu");

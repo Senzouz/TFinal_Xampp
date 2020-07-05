@@ -7,6 +7,7 @@ Game.prototype = {
     this.numLevels = 3;
     this.PLAYER_SPEED = 200;
     this.BULLET_SPEED = -200;
+
     this.shooting_time = 0;
     this.SHOOTING_TIMER = 200;
     this.ENEMY_SPAWN_TIMER = 1000 / this.currentLevel;
@@ -28,6 +29,12 @@ Game.prototype = {
     this.player = new Player(this.game, this.hp, this.PLAYER_SPEED);
     this.player.createBullet.add(this.createPlayerBullet, this);
 
+    this.es_sfx = this.game.add.audio("enemy_shoot");
+    this.es_sfx.volume = 0.5;
+
+    this.ps_sfx = this.game.add.audio("player_shoot");
+    this.ps_sfx.volume = 0.1;
+
     this.initBullets();
     this.initEnemies();
     this.loadLevel();
@@ -41,6 +48,28 @@ Game.prototype = {
       "Score :" + this.score
     );
     this.scoreText.fill = "#FFFFFF";
+
+    this.hpText = this.game.add.text(
+      this.game.world.width * 0.9,
+      this.game.world.height * 0.05,
+      "HP :" + this.player.hp
+    );
+    this.hpText.fill = "#FFFFFF";
+
+    this.timeText = this.game.add.text(
+      this.game.world.centerX,
+      this.game.world.height * 0.05,
+      "0:00" + this.player.hp
+    );
+    this.timeText.fill = "#FFFFFF";
+
+    this.level_ended = false;
+
+    /*this.shootingTimer = this.game.time.events.loop(
+      Phaser.Timer.SECONDS / 5,
+      this.createPlayerBullet,
+      this
+    );*/
   },
   initEnemies: function () {
     this.enemies = this.game.add.group();
@@ -57,15 +86,21 @@ Game.prototype = {
     let bullet = this.playerBullets.getFirstDead();
     if (!bullet) {
       bullet = new PlayerBullet(this.game, x, y);
+      this.playerBullets.add(bullet);
     } else {
       bullet.reset(x, y);
     }
-    this.playerBullets.add(bullet);
+    this.ps_sfx.play();
     bullet.body.velocity.y = this.BULLET_SPEED;
   },
   loadLevel: function () {
+    this.currentIndexEnemy = 0;
+    this.levelData = JSON.parse(
+      this.game.cache.getText("level" + this.currentLevel)
+    );
+    this.level_time = this.levelData.duration * 1000;
     this.endOfLevelTimer = this.game.time.events.add(
-      this.currentLevel * 60 * 1000,
+      this.levelData.duration * 1000,
       function () {
         this.orchestra.stop();
         this.currentLevel++;
@@ -83,15 +118,52 @@ Game.prototype = {
       },
       this
     );
+    this.scheduleNextEnemy();
   },
-  createEnemy: function () {
-    let types = ["greenEnemy", "yellowEnemy", "redEnemy"];
+  scheduleNextEnemy: function () {
+    let nextEnemy = this.levelData.enemies[this.currentIndexEnemy];
+    if (nextEnemy) {
+      let nextTime =
+        1000 *
+        (nextEnemy.time -
+          (this.currentIndexEnemy == 0
+            ? 1
+            : this.levelData.enemies[this.currentIndexEnemy - 1].time));
+      this.nextEnemyTimer = this.game.time.events.add(
+        nextTime,
+        function () {
+          this.createEnemy(
+            nextEnemy.x * this.game.world.width,
+            -100,
+            nextEnemy.health,
+            nextEnemy.key,
+            nextEnemy.scale,
+            nextEnemy.speedX,
+            nextEnemy.speedY
+          );
+          this.currentIndexEnemy++;
+          this.scheduleNextEnemy();
+        },
+        this
+      );
+    }
+  },
+  createEnemy: function (x, y, health, key, scale, speedX, speedY) {
+    let enemy = this.enemies.getFirstDead();
+    if (!enemy) {
+      enemy = new Enemy(this.game, x, y, key, health);
+      enemy.createBullet.add(this.createBulletEnemy, this);
+      this.enemies.add(enemy);
+    }
+    enemy.reset(x, y, health, key, scale, speedX, speedY);
+
+    /*let types = ["greenEnemy", "yellowEnemy", "redEnemy"];
     let key = this.game.rnd.integerInRange(0, 2);
     let RandX = this.game.rnd.realInRange(
       0.05 * this.game.world.width,
       0.95 * this.game.world.width
     );
-    let Yini = -100;
+    let Yini = -100;  
 
     let RandVeloX = this.game.rnd.realInRange(-120, 120);
     let RandVeloY = this.game.rnd.integerInRange(40, 100);
@@ -102,17 +174,26 @@ Game.prototype = {
       this.enemies.add(enemy);
     }
     enemy.createBullet.add(this.createBulletEnemy, this);
-    enemy.reset(RandX, Yini, 3, types[key], 3, RandVeloX, RandVeloY);
+    enemy.reset(RandX, Yini, 3, types[key], 3, RandVeloX, RandVeloY);*/
   },
-  createBulletEnemy: function (x, y, key) {
-    if (key != "greenEnemy") {
+  createBulletEnemy: function (x, y) {
+    let bullet = this.enemyBullets.getFirstDead();
+    if (!bullet) {
+      bullet = new EnemyBullet(this.game, x, y);
+    } else {
+      bullet.reset(this.game, x, y);
+    }
+    this.enemyBullets.add(bullet);
+    bullet.body.velocity.y = -this.BULLET_SPEED;
+    /*if (key != "greenEnemy") {
       let bullet = this.enemyBullets.getFirstDead();
       if (!bullet) {
         bullet = new EnemyBullet(this.game, x, y);
+        this.enemyBullets.add(bullet);
       } else {
         bullet.reset(this.game, x, y);
       }
-      this.enemyBullets.add(bullet);
+      this.es_sfx.play();
       if (key == "yellowEnemy") bullet.body.velocity.y = -this.BULLET_SPEED;
       if (key == "redEnemy") {
         bullet.body.velocity.x =
@@ -120,15 +201,9 @@ Game.prototype = {
         bullet.body.velocity.y =
           -this.BULLET_SPEED * ((this.player.y - y) / 750);
       }
-    }
+    }*/
   },
   update: function () {
-    this.enemy_spawn_time += this.game.time.elapsed;
-    if (this.enemy_spawn_time >= this.ENEMY_SPAWN_TIMER) {
-      this.createEnemy();
-      this.enemy_spawn_time = 0;
-    }
-
     this.shooting_time += this.game.time.elapsed;
     if (this.spaceBar.isDown && this.shooting_time >= this.SHOOTING_TIMER) {
       this.shooting_time = 0;
@@ -149,6 +224,20 @@ Game.prototype = {
       this
     );
     this.game.input.onDown.add(this.toggle, this);
+    this.level_time -= this.game.time.elapsed;
+
+    if (this.level_time > 0) {
+      this.timeText.text = (this.level_time / 1000).toFixed(2);
+    } else {
+      this.timeText.text = "0.00";
+    }
+    if (!this.level_ended && this.level_time < 5.5 * 1000) {
+      this.level_ended = true;
+      this.end_level = this.game.add.audio("end_level");
+      this.end_level.volume = 0.4;
+      this.end_level.play();
+      this.player.endGame();
+    }
   },
   isClose: function (actual, target) {
     return Math.abs(actual - target) < 0.1;
@@ -161,11 +250,14 @@ Game.prototype = {
   },
   damagePlayer: function (player, bullet) {
     bullet.kill();
-    //player.damage(1)
     this.player.hp--;
-    console.log(this.player.hp);
     console.log(bullet.position);
+    console.log(bullet.x, " , ", bullet.y);
+    this.hpText.text = "HP :" + this.player.hp;
     if (this.player.hp == 0) {
+      this.die_player = this.game.audio.add("player_die");
+      this.die_player.volume = 0.5;
+      this.die_player.play();
       this.orchestra.stop();
       this.game.state.start("GameOver", true, false, this.currentLevel);
     }
