@@ -156,9 +156,9 @@ Game.prototype = {
     let enemy = this.enemies.getFirstDead();
     if (!enemy) {
       enemy = new Enemy(this.game, x, y, key, health);
-      enemy.createBullet.add(this.createBulletEnemy, this);
       this.enemies.add(enemy);
     }
+    enemy.createBullet.add(this.createBulletEnemy, this);
     enemy.reset(x, y, scale, key, health, speedX, speedY);
 
     /*let types = ["greenEnemy", "yellowEnemy", "redEnemy"];
@@ -180,16 +180,16 @@ Game.prototype = {
     enemy.createBullet.add(this.createBulletEnemy, this);
     enemy.reset(RandX, Yini, 3, types[key], 3, RandVeloX, RandVeloY);*/
   },
-  createBulletEnemy: function (x, y) {
-    let bullet = this.enemyBullets.getFirstDead();
+  createBulletEnemy: function (x, y,key) {
+    /*let bullet = this.enemyBullets.getFirstDead();
     if (!bullet) {
       bullet = new EnemyBullet(this.game, x, y);
       this.enemyBullets.add(bullet);
     } else {
       bullet.reset(x, y);
     }
-    bullet.body.velocity.y = -this.BULLET_SPEED;
-    /*if (key != "greenEnemy") {
+    bullet.body.velocity.y = -this.BULLET_SPEED;*/
+    if (key != "greenEnemy") {
       let bullet = this.enemyBullets.getFirstDead();
       if (!bullet) {
         bullet = new EnemyBullet(this.game, x, y);
@@ -205,7 +205,7 @@ Game.prototype = {
         bullet.body.velocity.y =
           -this.BULLET_SPEED * ((this.player.y - y) / 750);
       }
-    }*/
+    }
   },
   update: function () {
     this.shooting_time += this.game.time.elapsed;

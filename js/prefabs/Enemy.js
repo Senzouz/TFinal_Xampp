@@ -94,7 +94,7 @@ Enemy.prototype.shoot = function () {
     this.y < this.game.height &&
     this.goUpdate
   ) {
-    this.createBullet.dispatch(this.x, this.y);
+    this.createBullet.dispatch(this.x, this.y, this.key);
   }
 };
 
