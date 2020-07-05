@@ -11,6 +11,33 @@
       "scale": 1
     },
     {
+      "time": 1,
+      "x": 0.05,
+      "health": 6,
+      "speedX": 20,
+      "speedY": 50,
+      "key": "greenEnemy",
+      "scale": 1
+    },
+    {
+      "time": 1,
+      "x": 0.05,
+      "health": 6,
+      "speedX": 20,
+      "speedY": 50,
+      "key": "greenEnemy",
+      "scale": 1
+    },
+    {
+      "time": 1,
+      "x": 0.05,
+      "health": 6,
+      "speedX": 20,
+      "speedY": 50,
+      "key": "greenEnemy",
+      "scale": 1
+    },
+    {
       "time": 2,
       "x": 0.1,
       "health": 3,

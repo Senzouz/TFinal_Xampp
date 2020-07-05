@@ -2,8 +2,8 @@ Game = function () {};
 
 Game.prototype = {
   init: function (currentLevel, hp) {
-    this.hp = hp;
-    this.currentLevel = currentLevel.currentLevel || 1;
+    this.hp = hp || 3;
+    this.currentLevel = currentLevel || 1;
     this.numLevels = 3;
     this.PLAYER_SPEED = 200;
     this.BULLET_SPEED = -200;
@@ -102,7 +102,6 @@ Game.prototype = {
     this.endOfLevelTimer = this.game.time.events.add(
       this.levelData.duration * 1000,
       function () {
-        this.orchestra.stop();
         this.currentLevel++;
         if (this.currentLevel <= this.numLevels) {
           this.game.state.start(
@@ -110,31 +109,30 @@ Game.prototype = {
             true,
             false,
             this.currentLevel,
-            this.playerHP
-          );
-        } else {
-          this.game.state.start(
-            "GameOver",
-            true,
-            false,
-            this.currentLevel,
             this.player.hp
           );
+        } else {
+          this.orchestra.stop();
+          this.game.state.start("GameOver", true, false, this.currentLevel);
         }
       },
       this
     );
+    console.log(this.levelData.enemies.length);
     this.scheduleNextEnemy();
   },
   scheduleNextEnemy: function () {
     let nextEnemy = this.levelData.enemies[this.currentIndexEnemy];
+    //    console.log(nextEnemy);
+
     if (nextEnemy) {
       let nextTime =
-        1000 *
+        500 *
         (nextEnemy.time -
           (this.currentIndexEnemy == 0
             ? 1
             : this.levelData.enemies[this.currentIndexEnemy - 1].time));
+      //console.log(this.levelData.enemies[this.currentIndexEnemy].time);
       this.nextEnemyTimer = this.game.time.events.add(
         nextTime,
         function () {
@@ -186,10 +184,10 @@ Game.prototype = {
     let bullet = this.enemyBullets.getFirstDead();
     if (!bullet) {
       bullet = new EnemyBullet(this.game, x, y);
+      this.enemyBullets.add(bullet);
     } else {
-      bullet.reset(this.game, x, y);
+      bullet.reset(x, y);
     }
-    this.enemyBullets.add(bullet);
     bullet.body.velocity.y = -this.BULLET_SPEED;
     /*if (key != "greenEnemy") {
       let bullet = this.enemyBullets.getFirstDead();
@@ -257,12 +255,6 @@ Game.prototype = {
   damagePlayer: function (player, bullet) {
     bullet.kill();
     this.player.hp--;
-    console.log("bullet");
-    console.log(bullet.position);
-    console.log(bullet.x, " , ", bullet.y);
-    console.log("player");
-    console.log(player.position);
-    console.log(player.x, " , ", player.y);
     this.hpText.text = "HP :" + this.player.hp;
     if (this.player.hp == 0) {
       this.die_player = this.game.add.audio("player_die");

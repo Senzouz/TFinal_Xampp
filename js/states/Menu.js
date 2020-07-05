@@ -96,6 +96,6 @@ Menu.prototype = {
     this.alumno_2_text.fill = "#FFFFFF";
   },
   goGame: function (currentLevel) {
-    this.state.start("Game", true, false, currentLevel, 3);
+    this.state.start("Game", true, false, currentLevel.currentLevel, 3);
   },
 };

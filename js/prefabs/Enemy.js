@@ -4,6 +4,9 @@ Enemy = function (game, x, y, key, health) {
   this.game = game;
   this.health = health;
 
+  this.shoot_factor =
+    key == "greenEnemy" ? 2.5 : key == "yellowEnemy" ? 1 : 0.5;
+
   this.init_tp = this.game.add.audio("int_tp");
   this.init_tp.volume = 0.15;
 
@@ -76,7 +79,11 @@ Enemy.prototype.reset = function (x, y, scale, key, health, speedX, speedY) {
 
 Enemy.prototype.scheduleShooting = function () {
   this.shoot();
-  this.enemyTimer.add(Phaser.Timer.SECOND / 2, this.scheduleShooting, this);
+  this.enemyTimer.add(
+    Phaser.Timer.SECOND * this.shoot_factor,
+    this.scheduleShooting,
+    this
+  );
 };
 
 Enemy.prototype.shoot = function () {
@@ -101,7 +108,6 @@ Enemy.prototype.setEntrance = function () {
 };
 
 Enemy.prototype.setDead = function () {
-  console.log("Killed");
   if (this.goUpdate) {
     this.out_tp.play();
   }

@@ -3,9 +3,9 @@ GameOver = function (game) {};
 //prototype: para crear más funcionalidades
 GameOver.prototype = {
   init: function (currentLevel) {
-    this.msg = currentLevel == 3 ? "VICTORY" : "DEFEAT";
+    this.msg = currentLevel == 4 ? "VICTORY" : "DEFEAT";
     this.gameover_theme = this.game.add.audio(
-      currentLevel == 3 ? "Victoria" : "Derrota"
+      currentLevel == 4 ? "Victoria" : "Derrota"
     );
     this.gameover_theme.play();
   },
