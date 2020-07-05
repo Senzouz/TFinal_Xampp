@@ -2,7 +2,7 @@ Player = function (game, hp, speed) {
   Phaser.Sprite.call(this, game, 0, 0, "player");
   this.anchor.setTo(0.5);
   this.game = game;
-  this.scale.setTo(0.1);
+  this.scale.setTo(0.08);
   this.hp = hp > 2 ? hp : hp + 1;
 
   this.x = this.game.world.centerX;

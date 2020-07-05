@@ -9,7 +9,7 @@ Game.prototype = {
     this.BULLET_SPEED = -200;
 
     this.shooting_time = 0;
-    this.SHOOTING_TIMER = 200;
+    this.SHOOTING_TIMER = 120;
     this.ENEMY_SPAWN_TIMER = 1000 / this.currentLevel;
     this.enemy_spawn_time = 0;
   },
@@ -195,7 +195,7 @@ Game.prototype = {
         bullet = new EnemyBullet(this.game, x, y);
         this.enemyBullets.add(bullet);
       } else {
-        bullet.reset(this.game, x, y);
+        bullet.reset(x, y);
       }
       this.es_sfx.play();
       if (key == "yellowEnemy") bullet.body.velocity.y = -this.BULLET_SPEED;
@@ -253,6 +253,8 @@ Game.prototype = {
     this.scoreText.text = "Score :" + this.score;
   },
   damagePlayer: function (player, bullet) {
+    console.log(player.position);
+    console.log(bullet.position);
     bullet.kill();
     this.player.hp--;
     this.hpText.text = "HP :" + this.player.hp;
