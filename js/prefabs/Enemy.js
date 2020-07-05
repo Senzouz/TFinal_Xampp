@@ -68,7 +68,7 @@ Enemy.prototype.reset = function (x, y, scale, key, health, speedX, speedY) {
   this.goUpdate = true;
 
   this.loadTexture(key);
-  this.scale.setTo(scale);
+  this.scale.setTo(scale / 2);
   this.body.velocity.x = speedX;
   this.body.velocity.y = speedY;
   this.enemyTimer.resume();
@@ -87,7 +87,7 @@ Enemy.prototype.shoot = function () {
     this.y < this.game.height &&
     this.goUpdate
   ) {
-    this.createBullet.dispatch(this.x, this.y, this.key);
+    this.createBullet.dispatch(this.x, this.y);
   }
 };
 

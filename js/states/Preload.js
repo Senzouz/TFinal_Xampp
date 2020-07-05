@@ -13,6 +13,7 @@ Preload.prototype = {
     this.load.image("space", "assets/images/space.png");
     this.load.image("logo", "assets/images/logo.png");
     this.load.image("player", "assets/images/player.png");
+    this.load.image("man", "assets/images/man.png");
     this.load.spritesheet("redEnemy", "assets/images/red_enemy.png", 52, 48, 3);
     this.load.spritesheet(
       "greenEnemy",

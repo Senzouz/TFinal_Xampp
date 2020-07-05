@@ -113,7 +113,13 @@ Game.prototype = {
             this.playerHP
           );
         } else {
-          this.game.state.start("GameOver", true, false, this.currentLevel);
+          this.game.state.start(
+            "GameOver",
+            true,
+            false,
+            this.currentLevel,
+            this.player.hp
+          );
         }
       },
       this
@@ -155,7 +161,7 @@ Game.prototype = {
       enemy.createBullet.add(this.createBulletEnemy, this);
       this.enemies.add(enemy);
     }
-    enemy.reset(x, y, health, key, scale, speedX, speedY);
+    enemy.reset(x, y, scale, key, health, speedX, speedY);
 
     /*let types = ["greenEnemy", "yellowEnemy", "redEnemy"];
     let key = this.game.rnd.integerInRange(0, 2);
@@ -251,11 +257,15 @@ Game.prototype = {
   damagePlayer: function (player, bullet) {
     bullet.kill();
     this.player.hp--;
+    console.log("bullet");
     console.log(bullet.position);
     console.log(bullet.x, " , ", bullet.y);
+    console.log("player");
+    console.log(player.position);
+    console.log(player.x, " , ", player.y);
     this.hpText.text = "HP :" + this.player.hp;
     if (this.player.hp == 0) {
-      this.die_player = this.game.audio.add("player_die");
+      this.die_player = this.game.add.audio("player_die");
       this.die_player.volume = 0.5;
       this.die_player.play();
       this.orchestra.stop();
